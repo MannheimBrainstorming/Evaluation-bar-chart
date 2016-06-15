@@ -1,0 +1,143 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import openpyxl
+import glob
+import glob, os
+
+def calculating_aprf(FileNames,counter):
+	Precision=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	Accuracy=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	Recall=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	F1=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	wb = openpyxl.load_workbook(FileNames)
+	sheet = wb.get_sheet_by_name('Sheet1')
+	j=0
+	Row_num=3
+	Gold3=0
+	sheet["L"+str(Row_num)]
+	sheet["F"+str(Row_num)]
+	if sheet["L"+str(Row_num)].value!=sheet["F"+str(Row_num)].value:
+		Gold3=1
+		counter+=1
+	for i in range(21):
+		sheet["B"+str(Row_num)]
+		Accuracy[j]=sheet["B"+str(Row_num)].value
+		sheet["G"+str(Row_num)]
+		Accuracy[j]+=sheet["G"+str(Row_num)].value
+		if Gold3==1:
+			sheet["L"+str(Row_num)]
+			Accuracy[j]+=sheet["L"+str(Row_num)].value
+		Row_num +=1
+		j +=1
+	j=0
+	Row_num=3
+	for i in range(21):
+		sheet["C"+str(Row_num)]
+		Precision[j]=sheet["C"+str(Row_num)].value
+		sheet["H"+str(Row_num)]
+		Precision[j]+=sheet["H"+str(Row_num)].value
+		if Gold3==1:
+			sheet["M"+str(Row_num)]
+			Precision[j]+=sheet["M"+str(Row_num)].value
+		Row_num +=1
+		j +=1
+	j=0
+	Row_num=3
+	for i in range(21):
+		sheet["D"+str(Row_num)]
+		Recall[j]=sheet["D"+str(Row_num)].value
+		sheet["I"+str(Row_num)]
+		Recall[j]+=sheet["I"+str(Row_num)].value
+		if Gold3==1:
+			sheet["N"+str(Row_num)]
+			Recall[j]+=sheet["N"+str(Row_num)].value
+		Row_num +=1
+		j +=1
+	j=0
+	Row_num=3
+	for i in range(21):
+		sheet["E"+str(Row_num)]
+		F1[j]=sheet["E"+str(Row_num)].value
+		sheet["J"+str(Row_num)]
+		F1[j]+=sheet["J"+str(Row_num)].value
+		if Gold3==1:
+			sheet["O"+str(Row_num)]
+			F1[j]+=sheet["O"+str(Row_num)].value
+		Row_num +=1
+		j +=1
+	return(Accuracy, Precision,Recall, F1,counter)
+
+def reading_file_names():
+	FileNames=[]
+	NumberOfFiles=0
+	os.chdir("/home/farbod/Desktop/Final_Plot_chart")
+	for file in glob.glob("*.xlsx"):
+		FileNames.append(file)
+		NumberOfFiles +=1
+	return(FileNames, NumberOfFiles)
+
+
+'''
+sheet["B"]
+sheet["C"]
+sheet["D"]
+sheet["E"]
+'''
+Precision=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+Accuracy=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+Recall=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+F1=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+A=[]
+P=[]
+R=[]
+F=[]
+FileNames=[]
+NumberOfFiles=0
+counter=0
+FileNames, NumberOfFiles=reading_file_names()
+
+for i in range(NumberOfFiles):
+	A,P,R,F,counter=calculating_aprf(FileNames[i],counter)
+	for j in range(21):
+		Accuracy[j]+=A[j]
+		Precision[j]+=P[j]
+		Recall[j]+=R[j]
+		F1[j]+=F[j]
+
+NumberOfFiles=NumberOfFiles*2
+NumberOfFiles+=counter
+for i in range(21):
+	Accuracy[i]=Accuracy[i]/NumberOfFiles
+	Precision[i]=Precision[i]/NumberOfFiles
+	Recall[i]=Recall[i]/NumberOfFiles
+	F1[i]=F[i]/NumberOfFiles
+
+#Accuracy, Precision, Recall, F1=calculating_aprf(FileNames)
+for i in range(21):
+	print(Accuracy[i])
+
+
+N = 21
+
+
+ind = np.arange(N)  # the x locations for the groups
+width = 0.10       # the width of the bars
+
+fig, ax = plt.subplots()
+rects1 = ax.bar(ind, Accuracy, width, color='b')
+rects2 = ax.bar(ind + width, Precision, width, color='y')
+rects3 = ax.bar(ind + width + width, Recall, width, color='r')
+rects4 = ax.bar(ind + width + width + width, F1, width, color='g')
+
+
+
+# add some text for labels, title and axes ticks
+ax.set_ylabel('Scores')
+ax.set_title('Evaluation Measure')
+ax.set_xticks(ind + width)
+ax.set_xticklabels(('DB', 'F-CL3', 'F-CL4', 'F-CL5', 'F-CL6', 'F-SL3', 'F-SL4','F-SL5', 'F-SL6','KM3', 'KM4', 'KM5', 'KM6', 'KMed3', 'KMed4', 'KMed5', 'KMed6', 'KMK3', 'KMK4', 'KMK5', 'KMK6'))
+
+ax.legend((rects1[0], rects2[0], rects3[0], rects4[0]), ('Accuracy', 'Precision', 'Recall', 'F1'))
+
+
+plt.show()
