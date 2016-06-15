@@ -1,0 +1,242 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import openpyxl
+import glob
+import glob, os
+import math
+
+def calculating_SE(FileNames,PrecisionAVG,AccuracyAVG,RecallAVG,F1AVG):
+	Precision=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	Accuracy=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	Recall=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	F1=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	wb = openpyxl.load_workbook(FileNames)
+	sheet = wb.get_sheet_by_name('Sheet1')
+	j=0
+	Row_num=3
+	Gold3=0
+	sheet["L"+str(Row_num)]
+	sheet["F"+str(Row_num)]
+	if sheet["L"+str(Row_num)].value!=sheet["F"+str(Row_num)].value:
+		Gold3=1
+	for i in range(21):
+		sheet["B"+str(Row_num)]
+		Accuracy[j]=math.pow(sheet["B"+str(Row_num)].value-AccuracyAVG[j],2)
+		sheet["G"+str(Row_num)]
+		Accuracy[j]+=math.pow(sheet["G"+str(Row_num)].value-AccuracyAVG[j],2)
+		if Gold3==1:
+			sheet["L"+str(Row_num)]
+			Accuracy[j]+=math.pow(sheet["L"+str(Row_num)].value-AccuracyAVG[j],2)
+		Row_num +=1
+		j +=1
+	j=0
+	Row_num=3
+	for i in range(21):
+		sheet["C"+str(Row_num)]
+		Precision[j]=math.pow(sheet["C"+str(Row_num)].value-PrecisionAVG[j],2)
+		sheet["H"+str(Row_num)]
+		Precision[j]+=math.pow(sheet["H"+str(Row_num)].value-PrecisionAVG[j],2)
+		if Gold3==1:
+			sheet["M"+str(Row_num)]
+			Precision[j]+=math.pow(sheet["M"+str(Row_num)].value-PrecisionAVG[j],2)
+		Row_num +=1
+		j +=1
+	j=0
+	Row_num=3
+	for i in range(21):
+		sheet["D"+str(Row_num)]
+		Recall[j]=math.pow(sheet["D"+str(Row_num)].value-RecallAVG[j],2)
+		sheet["I"+str(Row_num)]
+		Recall[j]+=math.pow(sheet["I"+str(Row_num)].value-RecallAVG[j],2)
+		if Gold3==1:
+			sheet["N"+str(Row_num)]
+			Recall[j]+=math.pow(sheet["N"+str(Row_num)].value-RecallAVG[j],2)
+		Row_num +=1
+		j +=1
+	j=0
+	Row_num=3
+	for i in range(21):
+		sheet["E"+str(Row_num)]
+		F1[j]=math.pow(sheet["E"+str(Row_num)].value-F1AVG[j],2)
+		sheet["J"+str(Row_num)]
+		F1[j]+=math.pow(sheet["J"+str(Row_num)].value-F1AVG[j],2)
+		if Gold3==1:
+			sheet["O"+str(Row_num)]
+			F1[j]+=math.pow(sheet["O"+str(Row_num)].value-F1AVG[j],2)
+		Row_num +=1
+		j +=1
+	return(Accuracy, Precision,Recall, F1)
+
+def calculating_aprf(FileNames,counter):
+	Precision=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	Accuracy=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	Recall=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	F1=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	wb = openpyxl.load_workbook(FileNames)
+	sheet = wb.get_sheet_by_name('Sheet1')
+	j=0
+	Row_num=3
+	Gold3=0
+	sheet["L"+str(Row_num)]
+	sheet["F"+str(Row_num)]
+	if sheet["L"+str(Row_num)].value!=sheet["F"+str(Row_num)].value:
+		Gold3=1
+		counter+=1
+	for i in range(21):
+		sheet["B"+str(Row_num)]
+		Accuracy[j]=sheet["B"+str(Row_num)].value
+		sheet["G"+str(Row_num)]
+		Accuracy[j]+=sheet["G"+str(Row_num)].value
+		if Gold3==1:
+			sheet["L"+str(Row_num)]
+			Accuracy[j]+=sheet["L"+str(Row_num)].value
+		Row_num +=1
+		j +=1
+	j=0
+	Row_num=3
+	for i in range(21):
+		sheet["C"+str(Row_num)]
+		Precision[j]=sheet["C"+str(Row_num)].value
+		sheet["H"+str(Row_num)]
+		Precision[j]+=sheet["H"+str(Row_num)].value
+		if Gold3==1:
+			sheet["M"+str(Row_num)]
+			Precision[j]+=sheet["M"+str(Row_num)].value
+		Row_num +=1
+		j +=1
+	j=0
+	Row_num=3
+	for i in range(21):
+		sheet["D"+str(Row_num)]
+		Recall[j]=sheet["D"+str(Row_num)].value
+		sheet["I"+str(Row_num)]
+		Recall[j]+=sheet["I"+str(Row_num)].value
+		if Gold3==1:
+			sheet["N"+str(Row_num)]
+			Recall[j]+=sheet["N"+str(Row_num)].value
+		Row_num +=1
+		j +=1
+	j=0
+	Row_num=3
+	for i in range(21):
+		sheet["E"+str(Row_num)]
+		F1[j]=sheet["E"+str(Row_num)].value
+		sheet["J"+str(Row_num)]
+		F1[j]+=sheet["J"+str(Row_num)].value
+		if Gold3==1:
+			sheet["O"+str(Row_num)]
+			F1[j]+=sheet["O"+str(Row_num)].value
+		Row_num +=1
+		j +=1
+	return(Accuracy, Precision,Recall, F1,counter)
+
+def reading_file_names():
+	FileNames=[]
+	NumberOfFiles=0
+	os.chdir("/home/farbod/Desktop/Final_Plot_chart")
+	for file in glob.glob("*.xlsx"):
+		FileNames.append(file)
+		NumberOfFiles +=1
+	return(FileNames, NumberOfFiles)
+
+
+'''
+sheet["B"]
+sheet["C"]
+sheet["D"]
+sheet["E"]
+'''
+Precision=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+Accuracy=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+Recall=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+F1=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+PrecisionSE=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+AccuracySE=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+RecallSE=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+F1SE=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+A=[]
+P=[]
+R=[]
+F=[]
+ASE=[]
+PSE=[]
+RSE=[]
+FSE=[]
+FileNames=[]
+NumberOfFiles=0
+counter=0
+FileNames, NumberOfFiles=reading_file_names()
+NumberOfFilesOld=NumberOfFiles
+
+for i in range(NumberOfFiles):
+	A,P,R,F,counter=calculating_aprf(FileNames[i],counter)
+	for j in range(21):
+		Accuracy[j]+=A[j]
+		Precision[j]+=P[j]
+		Recall[j]+=R[j]
+		F1[j]+=F[j]
+
+NumberOfFiles=NumberOfFiles*2
+NumberOfFiles+=counter
+
+for i in range(21):
+	Accuracy[i]=Accuracy[i]/NumberOfFiles
+	Precision[i]=Precision[i]/NumberOfFiles
+	Recall[i]=Recall[i]/NumberOfFiles
+	F1[i]=F[i]/NumberOfFiles
+
+
+for i in range(NumberOfFilesOld):
+	ASE,PSE,RSE,FSE=calculating_SE(FileNames[i],Precision,Accuracy,Recall,F1)
+	for j in range(21):
+		AccuracySE[j]+=ASE[j]
+		PrecisionSE[j]+=PSE[j]
+		RecallSE[j]+=RSE[j]
+		F1SE[j]+=F1SE[j]
+
+NumberOfFilesNew=NumberOfFiles
+NumberOfFiles=math.sqrt(NumberOfFiles)
+for i in range(21):
+	AccuracySE[i]=AccuracySE[i]/NumberOfFiles
+	AccuracySE[i]=math.sqrt(AccuracySE[i])
+	AccuracySE[i]=AccuracySE[i]/NumberOfFilesNew
+	PrecisionSE[j]=PrecisionSE[j]/NumberOfFiles
+	PrecisionSE[j]=math.sqrt(PrecisionSE[j])
+	PrecisionSE[j]=PrecisionSE[j]/NumberOfFilesNew
+	RecallSE[j]=RecallSE[j]/NumberOfFiles
+	RecallSE[j]=math.sqrt(RecallSE[j])
+	RecallSE[j]=RecallSE[j]/NumberOfFilesNew
+	F1SE[j]=F1SE[j]/NumberOfFiles
+	F1SE[j]=math.sqrt(F1SE[j])
+	F1SE[j]=F1SE/NumberOfFilesNew
+
+
+
+#Accuracy, Precision, Recall, F1=calculating_aprf(FileNames)
+
+
+
+N = 21
+
+
+ind = np.arange(N)  # the x locations for the groups
+width = 0.10       # the width of the bars
+
+fig, ax = plt.subplots()
+rects1 = ax.bar(ind, AccuracySE, width, color='b')
+rects2 = ax.bar(ind + width, PrecisionSE, width, color='y')
+rects3 = ax.bar(ind + width + width, RecallSE, width, color='r')
+rects4 = ax.bar(ind + width + width + width, F1SE, width, color='g')
+
+
+
+# add some text for labels, title and axes ticks
+ax.set_ylabel('Scores')
+ax.set_title('Evaluation Measure')
+ax.set_xticks(ind + width)
+ax.set_xticklabels(('DB', 'F-CL3', 'F-CL4', 'F-CL5', 'F-CL6', 'F-SL3', 'F-SL4','F-SL5', 'F-SL6','KM3', 'KM4', 'KM5', 'KM6', 'KMed3', 'KMed4', 'KMed5', 'KMed6', 'KMK3', 'KMK4', 'KMK5', 'KMK6'))
+
+ax.legend((rects1[0], rects2[0], rects3[0], rects4[0]), ('Accuracy', 'Precision', 'Recall', 'F1'))
+
+
+plt.show()
